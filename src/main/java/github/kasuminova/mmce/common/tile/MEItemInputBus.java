@@ -37,6 +37,8 @@ public class MEItemInputBus extends MEItemBus {
 
     private int thresholdValue = 256;
 
+    private boolean firstCheck = true;
+
     @Override
     public IOInventory buildInventory() {
         int size = 30;
@@ -152,6 +154,11 @@ public class MEItemInputBus extends MEItemBus {
     }
 
     private boolean needsUpdate() {
+        if (firstCheck) {
+            firstCheck = false;
+            return true;
+        }
+
         for (int slot = 0; slot < configInventory.getSlots(); slot++) {
             ItemStack cfgStack = configInventory.getStackInSlot(slot);
             ItemStack invStack = inventory.getStackInSlot(slot);
