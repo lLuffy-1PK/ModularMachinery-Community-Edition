@@ -24,7 +24,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 
 public class MEItemInputBus extends MEItemBus {
@@ -36,8 +37,6 @@ public class MEItemInputBus extends MEItemBus {
     private MERequestMode meRequestMode = MERequestMode.DEFAULT;
 
     private int thresholdValue = 256;
-
-    private boolean firstCheck = true;
 
     @Override
     public IOInventory buildInventory() {
@@ -154,11 +153,6 @@ public class MEItemInputBus extends MEItemBus {
     }
 
     private boolean needsUpdate() {
-        if (firstCheck) {
-            firstCheck = false;
-            return true;
-        }
-
         for (int slot = 0; slot < configInventory.getSlots(); slot++) {
             ItemStack cfgStack = configInventory.getStackInSlot(slot);
             ItemStack invStack = inventory.getStackInSlot(slot);
@@ -321,7 +315,7 @@ public class MEItemInputBus extends MEItemBus {
 
     @Override
     public void markNoUpdate() {
-        if (proxy.isActive() && hasChangedSlots()) {
+        if (hasChangedSlots()) {
             try {
                 proxy.getTick().alertDevice(proxy.getNode());
             } catch (GridAccessException e) {

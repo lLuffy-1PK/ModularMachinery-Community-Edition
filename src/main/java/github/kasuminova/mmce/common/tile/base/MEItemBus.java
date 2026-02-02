@@ -3,7 +3,6 @@ package github.kasuminova.mmce.common.tile.base;
 import appeng.api.AEApi;
 import appeng.api.networking.ticking.IGridTickable;
 import appeng.api.storage.channels.IItemStorageChannel;
-import appeng.me.GridAccessException;
 import hellfirepvp.modularmachinery.common.util.IOInventory;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -89,14 +88,6 @@ public abstract class MEItemBus extends MEMachineComponent implements IGridTicka
             slotIDs[slotID] = slotID;
         }
         inventory.setStackLimit(Integer.MAX_VALUE, slotIDs);
-
-        if (inventory.isEmpty()) return;
-
-        try {
-            proxy.getTick().alertDevice(proxy.getNode());
-        } catch (GridAccessException e) {
-            // oh god
-        }
     }
 
     @Override
