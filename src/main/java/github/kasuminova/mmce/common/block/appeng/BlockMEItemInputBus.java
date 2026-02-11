@@ -13,7 +13,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -44,38 +43,15 @@ public class BlockMEItemInputBus extends BlockMEItemBus {
         return new MEItemInputBus();
     }
 
+    @Nonnull
     @Override
-    public void dropBlockAsItemWithChance(@Nonnull final World worldIn, @Nonnull final BlockPos pos, @Nonnull final IBlockState state, final float chance, final int fortune) {
-    }
+    protected ItemStack getRestorableDropItem(@Nonnull IBlockAccess world, @Nonnull BlockPos pos) {
+        TileEntity te = world.getTileEntity(pos);
+        if (!(te instanceof MEItemInputBus bus) || (!bus.hasItem() && !bus.configInvHasItem())) {
+            return ItemStack.EMPTY;
+        }
 
-    @Override
-    public void getDrops(@Nonnull final NonNullList<ItemStack> drops, @Nonnull final IBlockAccess world, @Nonnull final BlockPos pos, @Nonnull final IBlockState state, final int fortune) {
-    }
-
-    @Override
-    public void breakBlock(final World worldIn,
-                           @Nonnull final BlockPos pos,
-                           @Nonnull final IBlockState state)
-    {
-        TileEntity te = worldIn.getTileEntity(pos);
         ItemStack dropped = new ItemStack(ItemsMM.meItemInputBus);
-
-        if (te == null) {
-            spawnAsEntity(worldIn, pos, dropped);
-            worldIn.removeTileEntity(pos);
-            return;
-        }
-        if (!(te instanceof final MEItemInputBus bus)) {
-            spawnAsEntity(worldIn, pos, dropped);
-            worldIn.removeTileEntity(pos);
-            return;
-        }
-        if (!bus.hasItem() && !bus.configInvHasItem()) {
-            spawnAsEntity(worldIn, pos, dropped);
-            worldIn.removeTileEntity(pos);
-            return;
-        }
-
         IOInventory inventory = bus.getInternalInventory();
         IOInventory cfgInventory = bus.getConfigInventory();
 
@@ -92,8 +68,7 @@ public class BlockMEItemInputBus extends BlockMEItemBus {
             cfgInventory.setStackInSlot(i, ItemStack.EMPTY);
         }
 
-        spawnAsEntity(worldIn, pos, dropped);
-        worldIn.removeTileEntity(pos);
+        return dropped;
     }
 
     @Override

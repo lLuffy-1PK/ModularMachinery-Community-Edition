@@ -13,7 +13,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -45,39 +44,18 @@ public class BlockMEItemOutputBus extends BlockMEItemBus {
         return new MEItemOutputBus();
     }
 
+    @Nonnull
     @Override
-    public void dropBlockAsItemWithChance(@Nonnull final World worldIn, @Nonnull final BlockPos pos, @Nonnull final IBlockState state, final float chance, final int fortune) {
-    }
+    protected ItemStack getRestorableDropItem(@Nonnull IBlockAccess world, @Nonnull BlockPos pos) {
+        TileEntity te = world.getTileEntity(pos);
 
-    @Override
-    public void getDrops(@Nonnull final NonNullList<ItemStack> drops, @Nonnull final IBlockAccess world, @Nonnull final BlockPos pos, @Nonnull final IBlockState state, final int fortune) {
-    }
+        if (!(te instanceof final MEItemOutputBus bus) || !bus.hasItem()) {
+            return ItemStack.EMPTY;
+        }
 
-    @Override
-    public void breakBlock(final World worldIn,
-                           @Nonnull final BlockPos pos,
-                           @Nonnull final IBlockState state)
-    {
-        TileEntity te = worldIn.getTileEntity(pos);
         ItemStack dropped = new ItemStack(ItemsMM.meItemOutputBus);
-
-        if (te == null) {
-            spawnAsEntity(worldIn, pos, dropped);
-            worldIn.removeTileEntity(pos);
-            return;
-        }
-        if (!(te instanceof final MEItemOutputBus bus)) {
-            spawnAsEntity(worldIn, pos, dropped);
-            worldIn.removeTileEntity(pos);
-            return;
-        }
-        if (!bus.hasItem()) {
-            spawnAsEntity(worldIn, pos, dropped);
-            worldIn.removeTileEntity(pos);
-            return;
-        }
-
         IOInventory inventory = bus.getInternalInventory();
+
         NBTTagCompound tag = new NBTTagCompound();
         tag.setTag("inventory", inventory.writeNBT());
         dropped.setTagCompound(tag);
@@ -86,9 +64,7 @@ public class BlockMEItemOutputBus extends BlockMEItemBus {
             inventory.setStackInSlot(i, ItemStack.EMPTY);
         }
 
-        spawnAsEntity(worldIn, pos, dropped);
-
-        worldIn.removeTileEntity(pos);
+        return dropped;
     }
 
     @Override

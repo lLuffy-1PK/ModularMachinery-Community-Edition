@@ -12,7 +12,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
@@ -43,32 +45,33 @@ public class BlockMEPatternProvider extends BlockMEMachineComponent {
     }
 
     @Override
-    public void dropBlockAsItemWithChance(@Nonnull final World worldIn, @Nonnull final BlockPos pos, @Nonnull final IBlockState state, final float chance, final int fortune) {
-    }
-
-    @Override
-    public void breakBlock(final World worldIn,
-                           @Nonnull final BlockPos pos,
-                           @Nonnull final IBlockState state)
+    public void getDrops(@Nonnull NonNullList<ItemStack> drops,
+                         @Nonnull IBlockAccess world,
+                         @Nonnull BlockPos pos,
+                         @Nonnull IBlockState state,
+                         int fortune)
     {
-        TileEntity te = worldIn.getTileEntity(pos);
-
-        if (te == null) {
-            super.dropBlockAsItemWithChance(worldIn, pos, state, 1.0F, 0);
-            worldIn.removeTileEntity(pos);
-            return;
-        }
-        if (!(te instanceof final MEPatternProvider provider) || provider.isAllDefault()) {
-            super.dropBlockAsItemWithChance(worldIn, pos, state, 1.0F, 0);
-            worldIn.removeTileEntity(pos);
+        TileEntity te = world.getTileEntity(pos);
+        if (!(te instanceof MEPatternProvider provider) || provider.isAllDefault()) {
+            super.getDrops(drops, world, pos, state, fortune);
             return;
         }
 
         ItemStack dropped = new ItemStack(ItemsMM.mePatternProvider);
         dropped.setTagInfo("patternProvider", provider.writeProviderNBT(new NBTTagCompound()));
 
-        spawnAsEntity(worldIn, pos, dropped);
-        worldIn.removeTileEntity(pos);
+        drops.add(dropped);
+    }
+
+    @Override
+    public boolean removedByPlayer(@Nonnull IBlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull EntityPlayer player, boolean willHarvest) {
+        return willHarvest || super.removedByPlayer(state, world, pos, player, willHarvest);
+    }
+
+    @Override
+    public void harvestBlock(@Nonnull World world, @Nonnull EntityPlayer player, @Nonnull BlockPos pos, @Nonnull IBlockState state, TileEntity te, @Nonnull ItemStack stack) {
+        super.harvestBlock(world, player, pos, state, te, stack);
+        world.setBlockToAir(pos);
     }
 
     @Override
