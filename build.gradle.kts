@@ -7,7 +7,7 @@ plugins {
     id("maven-publish")
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
     id("eclipse")
-    id("com.gtnewhorizons.retrofuturagradle") version "1.3.19"
+    id("com.gtnewhorizons.retrofuturagradle") version "1.4.9"
 }
 
 // Project properties
@@ -150,7 +150,7 @@ repositories {
     }
     maven {
         name = "GTNH Maven"
-        url = uri("http://jenkins.usrv.eu:8081/nexus/content/groups/public/")
+        url = uri("https://nexus.gtnewhorizons.com/repository/public/")
         isAllowInsecureProtocol = true
     }
 }
