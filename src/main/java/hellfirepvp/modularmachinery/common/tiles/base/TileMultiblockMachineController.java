@@ -850,6 +850,9 @@ public abstract class TileMultiblockMachineController extends TileEntityRestrict
     }
 
     public boolean canToggleInputMode() {
+        if (this.parentMachine == null) {
+            return false;
+        }
         return this.parentMachine.canToggleInputMode();
     }
 
